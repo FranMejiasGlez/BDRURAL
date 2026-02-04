@@ -1,0 +1,7 @@
+mysqld –install 
+
+net start mysql
+
+- u root -p
+
+#contra vacia
