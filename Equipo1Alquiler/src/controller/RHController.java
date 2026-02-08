@@ -5,6 +5,9 @@
 package controller;
 
 import java.sql.ResultSet;
+import java.util.Properties;
+import model.JDBC;
+import model.Sql;
 
 /**
  *
@@ -14,11 +17,22 @@ public class RHController {
 
     private int alquilados;
     private int personas;
+    private JDBC conector;
+    private Properties propiedades;
 
-    public ResultSet buscar(String provincia, int tipo,
+    public void buscar(String provincia, int tipo,
             String ubicacion, int capacidad) {
-        ResultSet cursor = null;
-        return cursor;
+        this.conector.setSentenciaSQL(Sql.generarSQL(provincia, tipo, ubicacion, capacidad));
+        this.conector.ejecutarConsultaActualizable();
+
+        ResultSet cursor = this.conector.getCursor();
+
+    }
+
+    public boolean conectarBD() {
+        this.conector = new JDBC();
+        this.conector.setConexion(propiedades);
+        return conector.getConexion() != null;
     }
 
     public ResultSet buscarTipos() {
@@ -34,6 +48,7 @@ public class RHController {
     public void volver() {
     }
 
-    public void finalizar() {
+    public boolean finalizar() {
+        return this.conector.cerrarConexion();
     }
 }
