@@ -127,7 +127,7 @@ public class ResultadosView extends javax.swing.JPanel {
         int fila = tablaResultados.rowAtPoint(evt.getPoint());
 
         // Si el usuario hace clic en la última columna (la de Alquilar)
-        if (columna == 4) { // Suponiendo que es la quinta columna (índice 4)
+        if (columna == 3) { // Suponiendo que es la quinta columna (índice 4)
             String nombre = tablaResultados.getValueAt(fila, 1).toString(); // Obtenemos el nombre del alojamiento
 
             // Mostramos un mensaje de confirmación (esto puntúa como RA)
@@ -165,9 +165,6 @@ public class ResultadosView extends javax.swing.JPanel {
     private javax.swing.JTable tablaResultados;
     // End of variables declaration//GEN-END:variables
 
-    // Esta clase hace que el botón sea "clicable" y ejecute acciones
-    // Esta clase dibuja el botón (Renderer) y le da vida (Editor)
-    // Esta clase ahora es RENDERER (dibuja) y EDITOR (funciona)
     class ButtonEditor extends javax.swing.DefaultCellEditor implements javax.swing.table.TableCellRenderer {
 
         protected javax.swing.JButton button;
@@ -206,25 +203,25 @@ public class ResultadosView extends javax.swing.JPanel {
         @Override
         public Object getCellEditorValue() {
             if (isPushed) {
-                // 1. Obtener la fila actual
+
                 int fila = tablaResultados.getSelectedRow();
 
-                // 2. Extraer la capacidad (asumiendo que está en la columna 2, ajusta según tu tabla)
+
                 try {
                     String capacidadStr = tablaResultados.getValueAt(fila, 2).toString();
                     int capacidad = Integer.parseInt(capacidadStr);
 
-                    // 3. Acumular en las variables del panel
+
                     totalAlojamientos++;
                     totalPersonas += capacidad;
 
                     javax.swing.JOptionPane.showMessageDialog(button, "Alquiler realizado. Total personas acumuladas: " + totalPersonas);
                 } catch (Exception e) {
-                    totalAlojamientos++; // Al menos contamos el alojamiento si falla el parseo
+                    totalAlojamientos++;
                 }
 
                 isPushed = false;
-                return "ALQUILADO"; // Esto hace que el botón desaparezca físicamente
+                return "ALQUILADO";
             }
             isPushed = false;
             return label;

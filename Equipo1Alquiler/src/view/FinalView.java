@@ -24,7 +24,7 @@ public class FinalView extends javax.swing.JPanel {
                 + "total de " + numPersonas + " personas."
                 + "</body></html>";
 
-        // Suponiendo que tu label se llama labelResumen
+
         labelCalcularAlquiler.setText(texto);
 
     }
