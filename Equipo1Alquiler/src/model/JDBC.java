@@ -8,8 +8,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,11 +60,16 @@ public class JDBC {
 
     public void setSentenciaSQL(String strSQL) {
         this.sentenciaSQL = strSQL;
-
     }
 
     public boolean ejecutarConsulta() {
-        return false;
+        try {
+            Statement stmt = conexion.createStatement();
+            cursor = stmt.executeQuery(sentenciaSQL);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
     }
 
     public boolean ejecutarConsultaActualizable() {
@@ -70,14 +77,28 @@ public class JDBC {
     }
 
     public ResultSet getCursor() {
-        return null;
+        return this.cursor;
     }
 
     public boolean cerrarCursor() {
-        return false;
+        try {
+            this.cursor.close();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println("Error cerrando el cursor");
+            return false;
+        }
+
     }
 
     public boolean cerrarConexion() {
-        return false;
+        try {
+            this.conexion.close();
+            return true;
+        } catch (SQLException ex) {
+            System.out.println("Error cerrando conexion con BBDD");
+            return false;
+        }
+
     }
 }
