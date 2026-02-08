@@ -10,11 +10,19 @@ FLUSH PRIVILEGES;
 
 CREATE TABLE Tipos (
     Codigo INT PRIMARY KEY,
-    Descripcion VARCHAR(40)
+    Descripcion VARCHAR(40) UNIQUE
 );
 
 
-CREATE TABLE Alojamientos ( Referencia INT AUTO_INCREMENT PRIMARY KEY, Nombre VARCHAR(60) NOT NULL, Poblacion VARCHAR(40) NOT NULL, Provincia VARCHAR(30) NOT NULL, Capacidad TINYINT UNSIGNED NOT NULL CHECK (Capacidad > 0), Tipo INT, Ubicacion VARCHAR(200), Alquilado BOOLEAN DEFAULT 0, FOREIGN KEY (Tipo) REFERENCES Tipos(Codigo) );
+CREATE TABLE Alojamientos ( 
+Referencia INT AUTO_INCREMENT PRIMARY KEY, 
+Nombre VARCHAR(60) NOT NULL, 
+Poblacion VARCHAR(40) NOT NULL, 
+Provincia VARCHAR(30) NOT NULL, 
+Capacidad TINYINT UNSIGNED NOT NULL CHECK (Capacidad > 0), 
+Tipo INT, Ubicacion ENUM('Aislada', 'En población') NOT NULL, 
+Alquilado BOOLEAN DEFAULT 0, 
+FOREIGN KEY (Tipo) REFERENCES Tipos(Codigo) );
 
 
 INSERT INTO Tipos (Codigo, Descripcion) VALUES 
