@@ -13,6 +13,14 @@ public class ResultadosView extends javax.swing.JPanel {
     private controller.RHController controller;
     private int totalAlojamientos = 0;
     private int totalPersonas = 0;
+    private java.util.ArrayList<Integer> capacidades = new java.util.ArrayList<>();
+    private java.util.ArrayList<Integer> referencias = new java.util.ArrayList<>();
+    
+    // Filtros actuales para poder recargar después de alquilar
+    private String filtroProvincia = "";
+    private int filtroTipo = 0;
+    private String filtroUbicacion = "";
+    private int filtroCapacidad = 0;
 
     /**
      * Creates new form ResultadosView
@@ -43,6 +51,82 @@ public class ResultadosView extends javax.swing.JPanel {
 
     public void setCapacidadInicial(int capacidadBuscador) {
         this.totalPersonas = capacidadBuscador;
+    }
+
+    public void cargarResultados(java.sql.ResultSet rs, String provincia, int tipo, String ubicacion, int capacidad) {
+        // Guardar los filtros para poder recargar después
+        this.filtroProvincia = provincia;
+        this.filtroTipo = tipo;
+        this.filtroUbicacion = ubicacion;
+        this.filtroCapacidad = capacidad;
+        
+        // Obtener el modelo de la tabla
+        javax.swing.table.DefaultTableModel modelo = 
+            (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
+        
+        // Limpiar la tabla actual (eliminar todas las filas)
+        modelo.setRowCount(0);
+        
+        // Limpiar las listas
+        capacidades.clear();
+        referencias.clear();
+        
+        try {
+            if (rs != null) {
+                // Recorrer el ResultSet y añadir filas
+                while (rs.next()) {
+                    // Obtener los valores de cada columna
+                    int referencia = rs.getInt("Referencia");
+                    String nombre = rs.getString("Nombre");
+                    String provinciaVal = rs.getString("Provincia");
+                    int capacidadVal = rs.getInt("Capacidad");
+                    
+                    // Guardar referencia y capacidad en las listas
+                    referencias.add(referencia);
+                    capacidades.add(capacidadVal);
+                    
+                    // Crear fila con los datos (la columna 4 es el botón)
+                    Object[] fila = new Object[] {
+                        referencia,    // Columna 0: Referencia
+                        nombre,        // Columna 1: Nombre
+                        provinciaVal,  // Columna 2: Provincia
+                        "Alquilar"     // Columna 3: Botón
+                    };
+                    
+                    // Añadir fila al modelo
+                    modelo.addRow(fila);
+                }
+                
+                System.out.println("DEBUG: Cargados " + modelo.getRowCount() + " resultados en la tabla");
+                System.out.println("DEBUG: Capacidades guardadas: " + capacidades.size());
+                System.out.println("DEBUG: Referencias guardadas: " + referencias.size());
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Error cargando resultados: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    // Método para recargar resultados después de alquilar
+    public void recargarResultados() {
+        if (controller != null) {
+            try {
+                System.out.println("DEBUG: Recargando resultados con filtros guardados...");
+                java.sql.ResultSet rs = controller.buscar(filtroProvincia, filtroTipo, filtroUbicacion, filtroCapacidad);
+                cargarResultados(rs, filtroProvincia, filtroTipo, filtroUbicacion, filtroCapacidad);
+                if (rs != null) {
+                    rs.close();
+                }
+                
+                // Forzar redibujado de la tabla
+                tablaResultados.revalidate();
+                tablaResultados.repaint();
+                System.out.println("DEBUG: Tabla recargada y redibujada");
+            } catch (Exception e) {
+                System.out.println("Error al recargar resultados: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -118,20 +202,7 @@ public class ResultadosView extends javax.swing.JPanel {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void tablaResultadosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaResultadosMouseClicked
-        // TODO add your handling code here:
-        int columna = tablaResultados.columnAtPoint(evt.getPoint());
-        int fila = tablaResultados.rowAtPoint(evt.getPoint());
-
-        // Si el usuario hace clic en la última columna (la de Alquilar)
-        if (columna == 3) { // Suponiendo que es la quinta columna (índice 4)
-            String nombre = tablaResultados.getValueAt(fila, 1).toString(); // Obtenemos el nombre del alojamiento
-
-            // Mostramos un mensaje de confirmación (esto puntúa como RA)
-            javax.swing.JOptionPane.showMessageDialog(this,
-                    "Has alquilado con éxito: " + nombre,
-                    "Alquiler Confirmado",
-                    javax.swing.JOptionPane.INFORMATION_MESSAGE);
-        }
+        // El manejo del clic en el botón Alquilar está en ButtonEditor.getCellEditorValue()
     }//GEN-LAST:event_tablaResultadosMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
@@ -186,20 +257,43 @@ public class ResultadosView extends javax.swing.JPanel {
         public Object getCellEditorValue() {
             if (isPushed) {
 
-                int fila = tablaResultados.getSelectedRow();
-
+                final int fila = tablaResultados.getSelectedRow();
+                System.out.println("DEBUG: Fila seleccionada: " + fila);
+                System.out.println("DEBUG: Tamaño de lista capacidades: " + ResultadosView.this.capacidades.size());
 
                 try {
-                    String capacidadStr = tablaResultados.getValueAt(fila, 2).toString();
-                    int capacidad = Integer.parseInt(capacidadStr);
+                    // Obtener la capacidad del alojamiento
+                    final int capacidad = ResultadosView.this.capacidades.get(fila);
+                    System.out.println("DEBUG: Fila " + fila + ", Capacidad: " + capacidad);
 
-
+                    // Actualizar contadores
                     totalAlojamientos++;
                     totalPersonas += capacidad;
-
-                    javax.swing.JOptionPane.showMessageDialog(button, "Alquiler realizado. Total personas acumuladas: " + totalPersonas);
+                    
+                    // Cancelar edición PRIMERO para evitar el error
+                    this.stopCellEditing();
+                    
+                    // Eliminar la fila DESPUÉS de un pequeño delay usando invokeLater
+                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                        public void run() {
+                            try {
+                                javax.swing.table.DefaultTableModel modelo = 
+                                    (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
+                                modelo.removeRow(fila);
+                                ResultadosView.this.capacidades.remove(fila);
+                                ResultadosView.this.referencias.remove(fila);
+                            } catch (Exception e) {
+                                System.out.println("DEBUG: Error al eliminar fila: " + e.getMessage());
+                            }
+                        }
+                    });
+                    
+                    javax.swing.JOptionPane.showMessageDialog(button, 
+                        "Alquiler realizado. Total personas acumuladas: " + totalPersonas);
+                    
                 } catch (Exception e) {
-                    totalAlojamientos++;
+                    System.out.println("DEBUG: Error al procesar alquiler: " + e.getMessage());
+                    e.printStackTrace();
                 }
 
                 isPushed = false;

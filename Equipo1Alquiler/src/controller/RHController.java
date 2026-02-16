@@ -9,7 +9,6 @@ import java.util.Properties;
 import model.JDBC;
 import view.AlquileresView;
 import view.FinalView;
-import view.ResultadosView;
 import javax.swing.JFrame;
 
 /**
@@ -18,22 +17,24 @@ import javax.swing.JFrame;
  */
 public class RHController {
 
-    private int alquilados;
-    private int personas;
     private JDBC conector;
     private Properties propiedades;
     private AlquileresView alquileresView;
     private JFrame framePrincipal;
 
-    public void buscar(String provincia, int tipo,
+    public ResultSet buscar(String provincia, int tipo,
             String ubicacion, int capacidad) {
         this.conector.setSentenciaSQL(generarSQL(provincia, tipo, ubicacion, capacidad));
         this.conector.ejecutarConsultaActualizable();
 
         ResultSet cursor = this.conector.getCursor();
-
+        return cursor;
     }
 // Setter para asignar la vista principal
+
+    public void setPropiedades(Properties propiedades) {
+        this.propiedades = propiedades;
+    }
 
     public void setAlquileresView(AlquileresView view) {
         this.alquileresView = view;
@@ -44,20 +45,41 @@ public class RHController {
         this.framePrincipal = frame;
     }
 
-    private String generarSQL(String provincia, int tipo,
-            String ubicacion, int capacidad) {
-        String sqlBase = "SELECT * FROM ALOJAMIENTOS WHERE DISPONIBLE=TRUE";
-        String sqlFinal = sqlBase;
-        return sqlFinal;
+    private String generarSQL(String provincia, int tipo, String ubicacion, int capacidad) {
+        StringBuilder sql = new StringBuilder("SELECT * FROM ALOJAMIENTOS WHERE Alquilado = 0");
+
+        // Filtro por provincia
+        if (provincia != null && !provincia.isEmpty()) {
+            sql.append(" AND Provincia LIKE '%").append(provincia).append("%'");
+        }
+
+        // Filtro por tipo (0 = "Sin especificar")
+        if (tipo > 0) {
+            sql.append(" AND Tipo = ").append(tipo);
+        }
+
+        // Filtro por ubicación
+        if (ubicacion != null && !ubicacion.isEmpty()) {
+            sql.append(" AND Ubicacion = '").append(ubicacion).append("'");
+        }
+
+        // Filtro por capacidad
+        if (capacidad > 0) {
+            sql.append(" AND Capacidad >= ").append(capacidad);
+        }
+
+        return sql.toString();
     }
 
     public boolean conectarBD() {
-        this.conector = new JDBC();
+        if (this.conector == null) {
+            this.conector = new JDBC();
+        }
         this.conector.setConexion(propiedades);
         return conector.getConexion() != null;
     }
 
-    private ResultSet buscarTipos() {
+    public ResultSet buscarTipos() {
         String sentencia = "SELECT * FROM TIPOS";
         conector.setSentenciaSQL(sentencia);
         conector.ejecutarConsulta();
@@ -65,16 +87,18 @@ public class RHController {
         return cursor;
     }
 
-    public boolean alquilar(int referencia) {
-        boolean alquilado = false;
-        return alquilado;
-    }
-
     public void volver() {
         if (alquileresView != null) {
             alquileresView.panelPrincipal.setVisible(true);
-            // Necesitamos acceder al panel de resultados
-            // Lo haremos mediante un método getter en AlquileresView
+            if (alquileresView.getPanelResultados() != null) {
+                alquileresView.getPanelResultados().setVisible(false);
+            }
+        }
+    }
+
+    public void finalizarBD() {
+        if (conector != null) {
+            conector.cerrarConexion();
         }
     }
 

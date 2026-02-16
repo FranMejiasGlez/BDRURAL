@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 16-feb-2026 13:57:48 by Hibernate Tools 3.2.1.GA -->
+<hibernate-mapping>
+    <class name="POJO.Tipos" table="tipos" catalog="bdrural">
+        <id name="codigo" type="int">
+            <column name="Codigo" />
+            <generator class="assigned" />
+        </id>
+        <property name="descripcion" type="string">
+            <column name="Descripcion" length="40" unique="true" />
+        </property>
+        <set name="alojamientoses" inverse="true">
+            <key>
+                <column name="Tipo" />
+            </key>
+            <one-to-many class="POJO.Alojamientos" />
+        </set>
+    </class>
+</hibernate-mapping>
