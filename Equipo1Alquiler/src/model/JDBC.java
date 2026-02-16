@@ -28,23 +28,22 @@ public class JDBC {
         String urlConexion = "";
         String usuario = "";
         String contra = "";
-        try {
-            properties.load(new FileInputStream("src/MySql.properties"));
-            nombreDriver = properties.getProperty("driver");
-            urlConexion = properties.getProperty("url");
-            usuario = properties.getProperty("usuario");
-            contra = properties.getProperty("password");
-        } catch (IOException ex) {
-            System.out.println("Error de E/S con fichero properties");
-        }
+
+        nombreDriver = properties.getProperty("driver");
+        urlConexion = properties.getProperty("url");
+        usuario = properties.getProperty("usuario");
+        contra = properties.getProperty("password");
+
         try {
             try {
                 Class.forName(nombreDriver);
             } catch (ClassNotFoundException ex) {
                 System.out.println("Clase no encontrada");
+                return false;
             }
             this.conexion = DriverManager.getConnection(urlConexion, usuario, contra);
             System.out.println("Conexion exitosa");
+            return true;
         } catch (SQLException ex) {
             System.out.println("No se pudo realizar la conexion: " + ex.getMessage());
         }
@@ -61,17 +60,28 @@ public class JDBC {
 
     public boolean ejecutarConsulta() {
         try {
-            Statement stmt = conexion.createStatement();
+            Statement stmt = conexion.createStatement(
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_READ_ONLY);
             cursor = stmt.executeQuery(sentenciaSQL);
             return true;
         } catch (SQLException e) {
+            System.out.println("Error ejecutando consulta: " + e.getMessage());
             return false;
         }
     }
 
     public boolean ejecutarConsultaActualizable() {
-
-        return false;
+        try {
+            Statement stmt = conexion.createStatement(
+                    ResultSet.TYPE_SCROLL_SENSITIVE,
+                    ResultSet.CONCUR_UPDATABLE);
+            cursor = stmt.executeQuery(sentenciaSQL);
+            return true;
+        } catch (SQLException e) {
+            System.out.println("Error ejecutando consulta actualizable: " + e.getMessage());
+            return false;
+        }
     }
 
     public ResultSet getCursor() {
