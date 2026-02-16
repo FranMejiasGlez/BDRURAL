@@ -34,8 +34,8 @@ INSERT INTO Tipos (Codigo, Descripcion) VALUES
 
 
 INSERT INTO Alojamientos (Nombre, Poblacion, Provincia, Capacidad, Tipo, Ubicacion, Alquilado) VALUES 
-('La Casita del Monte', 'Cazorla', 'Jaén', 4, 1, 'Calle Sierra 5', 0),
-('Hotel Central', 'Granada', 'Granada', 20, 2, 'Gran Vía 12', 1),
-('Apartamento Marítimo', 'Nerja', 'Málaga', 6, 3, 'Paseo Balcón de Europa', 0),
-('Albergue Juvenil', 'Cercedilla', 'Madrid', 50, 4, 'Ctra. de las Dehesas s/n', 0),
-('Camping Pinar', 'Conil', 'Cádiz', 100, 5, 'Carril de la Fuente', 0);
+('La Casita del Monte', 'Cazorla', 'Jaén', 4, 1, 'Aislada', 0),
+('Hotel Central', 'Granada', 'Granada', 20, 2, 'En población', 1),
+('Apartamento Marítimo', 'Nerja', 'Málaga', 6, 3, 'En población', 0),
+('Albergue Juvenil', 'Cercedilla', 'Madrid', 50, 4, 'En población', 0),
+('Camping Pinar', 'Conil', 'Cádiz', 100, 5, 'Aislada', 0);
