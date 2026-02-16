@@ -10,6 +10,7 @@ package view;
  */
 public class ResultadosView extends javax.swing.JPanel {
 
+    private controller.RHController controller;
     private int totalAlojamientos = 0;
     private int totalPersonas = 0;
 
@@ -26,6 +27,18 @@ public class ResultadosView extends javax.swing.JPanel {
         // Usamos el índice 3 que es tu cuarta columna
         tablaResultados.getColumnModel().getColumn(3).setCellRenderer(gestorBoton);
         tablaResultados.getColumnModel().getColumn(3).setCellEditor(gestorBoton);
+    }
+
+    public void setController(controller.RHController controller) {
+        this.controller = controller;
+    }
+
+    public int getTotalAlojamientos() {
+        return totalAlojamientos;
+    }
+
+    public int getTotalPersonas() {
+        return totalPersonas;
     }
 
     public void setCapacidadInicial(int capacidadBuscador) {
@@ -99,25 +112,8 @@ public class ResultadosView extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // 1. Buscamos la ventana (JFrame) que contiene este panel
-        java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(this);
-
-        if (win instanceof javax.swing.JFrame) {
-            javax.swing.JFrame frame = (javax.swing.JFrame) win;
-
-            // 2. Ocultamos el panel actual (Resultados)
-            this.setVisible(false);
-
-            // 3. Recorremos los componentes del Frame para encontrar el principal y mostrarlo
-            for (java.awt.Component c : frame.getContentPane().getComponents()) {
-                if (c instanceof javax.swing.JPanel && "panelPrincipal".equals(c.getName())) {
-                    c.setVisible(true);
-                }
-            }
-
-            // 4. Refrescamos la interfaz
-            frame.getContentPane().revalidate();
-            frame.getContentPane().repaint();
+        if (controller != null) {
+            controller.volver();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
@@ -139,22 +135,8 @@ public class ResultadosView extends javax.swing.JPanel {
     }//GEN-LAST:event_tablaResultadosMouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        java.awt.Window win = javax.swing.SwingUtilities.getWindowAncestor(this);
-        if (win instanceof javax.swing.JFrame) {
-            javax.swing.JFrame frame = (javax.swing.JFrame) win;
-
-            // Creamos la pantalla final
-            FinalView vistaFinal = new FinalView();
-
-            // PASAMOS LOS DATOS REALES acumulados
-            vistaFinal.setMensajeFinal(totalAlojamientos, totalPersonas);
-
-            // Cambiamos de pantalla
-            frame.getContentPane().removeAll();
-            frame.getContentPane().add(vistaFinal, java.awt.BorderLayout.CENTER);
-
-            frame.revalidate();
-            frame.repaint();
+        if (controller != null) {
+            controller.finalizar(totalAlojamientos, totalPersonas);
         }
     }//GEN-LAST:event_jButton2ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables

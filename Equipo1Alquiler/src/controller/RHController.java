@@ -7,6 +7,10 @@ package controller;
 import java.sql.ResultSet;
 import java.util.Properties;
 import model.JDBC;
+import view.AlquileresView;
+import view.FinalView;
+import view.ResultadosView;
+import javax.swing.JFrame;
 
 /**
  *
@@ -18,6 +22,8 @@ public class RHController {
     private int personas;
     private JDBC conector;
     private Properties propiedades;
+    private AlquileresView alquileresView;
+    private JFrame framePrincipal;
 
     public void buscar(String provincia, int tipo,
             String ubicacion, int capacidad) {
@@ -26,6 +32,16 @@ public class RHController {
 
         ResultSet cursor = this.conector.getCursor();
 
+    }
+// Setter para asignar la vista principal
+
+    public void setAlquileresView(AlquileresView view) {
+        this.alquileresView = view;
+    }
+// Setter para el frame principal
+
+    public void setFramePrincipal(JFrame frame) {
+        this.framePrincipal = frame;
     }
 
     private String generarSQL(String provincia, int tipo,
@@ -52,9 +68,22 @@ public class RHController {
     }
 
     public void volver() {
+        if (alquileresView != null) {
+            alquileresView.panelPrincipal.setVisible(true);
+            // Necesitamos acceder al panel de resultados
+            // Lo haremos mediante un método getter en AlquileresView
+        }
     }
 
-    public boolean finalizar() {
-        return this.conector.cerrarConexion();
+    public void finalizar(int totalAlojamientos, int totalPersonas) {
+        if (framePrincipal != null) {
+            FinalView vistaFinal = new FinalView();
+            vistaFinal.setMensajeFinal(totalAlojamientos, totalPersonas);
+
+            framePrincipal.getContentPane().removeAll();
+            framePrincipal.getContentPane().add(vistaFinal, java.awt.BorderLayout.CENTER);
+            framePrincipal.revalidate();
+            framePrincipal.repaint();
+        }
     }
 }
