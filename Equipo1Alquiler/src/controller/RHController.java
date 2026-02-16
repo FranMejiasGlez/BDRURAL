@@ -57,7 +57,7 @@ public class RHController {
         return conector.getConexion() != null;
     }
 
-    private ResultSet buscarTipos() {
+    public ResultSet buscarTipos() {
         String sentencia = "SELECT * FROM TIPOS";
         conector.setSentenciaSQL(sentencia);
         conector.ejecutarConsulta();
