@@ -7,7 +7,6 @@ package controller;
 import java.sql.ResultSet;
 import java.util.Properties;
 import model.JDBC;
-import model.Sql;
 
 /**
  *
@@ -22,11 +21,18 @@ public class RHController {
 
     public void buscar(String provincia, int tipo,
             String ubicacion, int capacidad) {
-        this.conector.setSentenciaSQL(Sql.generarSQL(provincia, tipo, ubicacion, capacidad));
+        this.conector.setSentenciaSQL(generarSQL(provincia, tipo, ubicacion, capacidad));
         this.conector.ejecutarConsultaActualizable();
 
         ResultSet cursor = this.conector.getCursor();
 
+    }
+
+    private String generarSQL(String provincia, int tipo,
+            String ubicacion, int capacidad) {
+        String sqlBase = "SELECT * FROM ALOJAMIENTOS WHERE DISPONIBLE=TRUE";
+        String sqlFinal = sqlBase;
+        return sqlFinal;
     }
 
     public boolean conectarBD() {
