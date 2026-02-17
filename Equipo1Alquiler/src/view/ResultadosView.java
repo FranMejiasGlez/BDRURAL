@@ -6,7 +6,8 @@ package view;
 
 /**
  *
- * @author Administrador
+ * @author Francisco Mejias
+ * @revision Andy Jan
  */
 public class ResultadosView extends javax.swing.JPanel {
 
@@ -15,7 +16,6 @@ public class ResultadosView extends javax.swing.JPanel {
     private int totalPersonas = 0;
     private java.util.ArrayList<Integer> capacidades = new java.util.ArrayList<>();
     private java.util.ArrayList<Integer> referencias = new java.util.ArrayList<>();
-    
     // Filtros actuales para poder recargar después de alquilar
     private String filtroProvincia = "";
     private int filtroTipo = 0;
@@ -59,18 +59,18 @@ public class ResultadosView extends javax.swing.JPanel {
         this.filtroTipo = tipo;
         this.filtroUbicacion = ubicacion;
         this.filtroCapacidad = capacidad;
-        
+
         // Obtener el modelo de la tabla
-        javax.swing.table.DefaultTableModel modelo = 
-            (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
-        
+        javax.swing.table.DefaultTableModel modelo =
+                (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
+
         // Limpiar la tabla actual (eliminar todas las filas)
         modelo.setRowCount(0);
-        
+
         // Limpiar las listas
         capacidades.clear();
         referencias.clear();
-        
+
         try {
             if (rs != null) {
                 // Recorrer el ResultSet y añadir filas
@@ -80,23 +80,23 @@ public class ResultadosView extends javax.swing.JPanel {
                     String nombre = rs.getString("Nombre");
                     String provinciaVal = rs.getString("Provincia");
                     int capacidadVal = rs.getInt("Capacidad");
-                    
+
                     // Guardar referencia y capacidad en las listas
                     referencias.add(referencia);
                     capacidades.add(capacidadVal);
-                    
+
                     // Crear fila con los datos (la columna 4 es el botón)
-                    Object[] fila = new Object[] {
-                        referencia,    // Columna 0: Referencia
-                        nombre,        // Columna 1: Nombre
-                        provinciaVal,  // Columna 2: Provincia
-                        "Alquilar"     // Columna 3: Botón
+                    Object[] fila = new Object[]{
+                        referencia, // Columna 0: Referencia
+                        nombre, // Columna 1: Nombre
+                        provinciaVal, // Columna 2: Provincia
+                        "Alquilar" // Columna 3: Botón
                     };
-                    
+
                     // Añadir fila al modelo
                     modelo.addRow(fila);
                 }
-                
+
                 System.out.println("DEBUG: Cargados " + modelo.getRowCount() + " resultados en la tabla");
                 System.out.println("DEBUG: Capacidades guardadas: " + capacidades.size());
                 System.out.println("DEBUG: Referencias guardadas: " + referencias.size());
@@ -106,7 +106,7 @@ public class ResultadosView extends javax.swing.JPanel {
             e.printStackTrace();
         }
     }
-    
+
     // Método para recargar resultados después de alquilar
     public void recargarResultados() {
         if (controller != null) {
@@ -117,7 +117,7 @@ public class ResultadosView extends javax.swing.JPanel {
                 if (rs != null) {
                     rs.close();
                 }
-                
+
                 // Forzar redibujado de la tabla
                 tablaResultados.revalidate();
                 tablaResultados.repaint();
@@ -237,16 +237,16 @@ public class ResultadosView extends javax.swing.JPanel {
                 }
             });
         }
-        
+
         private void procesarAlquiler() {
             final int fila = currentRow;
             System.out.println("DEBUG: Procesando alquiler para fila: " + fila);
-            
+
             if (fila < 0 || fila >= ResultadosView.this.capacidades.size()) {
                 System.out.println("DEBUG: Fila inválida");
                 return;
             }
-            
+
             System.out.println("DEBUG: Tamaño de lista capacidades: " + ResultadosView.this.capacidades.size());
 
             try {
@@ -258,24 +258,24 @@ public class ResultadosView extends javax.swing.JPanel {
 
                 // Verificar que el controller esté disponible
                 if (controller == null) {
-                    javax.swing.JOptionPane.showMessageDialog(button, 
-                        "ERROR: Controller no inicializado", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    javax.swing.JOptionPane.showMessageDialog(button,
+                            "ERROR: Controller no inicializado", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
                     cancelCellEditing();
                     return;
                 }
-                
+
                 // Llamar al método del controller para alquilar en la BD (RA2.f y RA2.j)
                 boolean exito = controller.alquilarAlojamiento(referencia);
-                
+
                 if (exito) {
                     // Actualizar contadores solo si el alquiler fue exitoso
                     totalAlojamientos++;
                     totalPersonas += capacidad;
-                    
+
                     // Eliminar la fila inmediatamente
                     try {
-                        javax.swing.table.DefaultTableModel modelo = 
-                            (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
+                        javax.swing.table.DefaultTableModel modelo =
+                                (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
                         modelo.removeRow(fila);
                         ResultadosView.this.capacidades.remove(fila);
                         ResultadosView.this.referencias.remove(fila);
@@ -283,27 +283,27 @@ public class ResultadosView extends javax.swing.JPanel {
                     } catch (Exception e) {
                         System.out.println("DEBUG: Error al eliminar fila: " + e.getMessage());
                     }
-                    
-                    javax.swing.JOptionPane.showMessageDialog(button, 
-                        "Alquiler realizado exitosamente.\nTotal personas acumuladas: " + totalPersonas);
+
+                    javax.swing.JOptionPane.showMessageDialog(button,
+                            "Alquiler realizado exitosamente.\nTotal personas acumuladas: " + totalPersonas);
                 } else {
                     // El alquiler falló (ya estaba alquilado o error en BD)
-                    javax.swing.JOptionPane.showMessageDialog(button, 
-                        "ERROR: No se pudo realizar el alquiler.\nEl alojamiento ya no está disponible o ha ocurrido un error.", 
-                        "Error de alquiler", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    
+                    javax.swing.JOptionPane.showMessageDialog(button,
+                            "ERROR: No se pudo realizar el alquiler.\nEl alojamiento ya no está disponible o ha ocurrido un error.",
+                            "Error de alquiler", javax.swing.JOptionPane.ERROR_MESSAGE);
+
                     // Recargar resultados para mostrar el estado actual
                     recargarResultados();
                 }
-                
+
             } catch (Exception e) {
                 System.out.println("DEBUG: Error al procesar alquiler: " + e.getMessage());
                 e.printStackTrace();
-                javax.swing.JOptionPane.showMessageDialog(button, 
-                    "ERROR inesperado: " + e.getMessage(), 
-                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(button,
+                        "ERROR inesperado: " + e.getMessage(),
+                        "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             }
-            
+
             // Cancelar la edición para evitar que la tabla intente actualizar la celda
             cancelCellEditing();
         }

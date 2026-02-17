@@ -34,18 +34,18 @@ public class Main {
         // 3. Intentar conectar BD (antes de Swing)
         boolean conexionExitosa = controller.conectarBD();
         if (!conexionExitosa) {
-            // Mostrar diálogo con opciones al usuario
+            // Mostrar dialogo con opciones al usuario
             int opcion = mostrarDialogoConexionFallida();
-            
+
             if (opcion == 0) { // Reintentar
-                System.out.println("Reintentando conexión...");
+                System.out.println("Reintentando conexion...");
                 conexionExitosa = controller.conectarBD();
                 if (!conexionExitosa) {
-                    mostrarError("No se pudo conectar después de reintentar. La aplicación se cerrará.");
+                    mostrarError("No se pudo conectar despues de reintentar. La aplicacion se cerrara.");
                     return;
                 }
-            } else if (opcion == 2 || opcion == JOptionPane.CLOSED_OPTION) { // Salir o cerrar diálogo
-                System.out.println("Usuario eligió salir");
+            } else if (opcion == 2 || opcion == JOptionPane.CLOSED_OPTION) { // Salir o cerrar dialogo
+                System.out.println("Usuario eligio salir");
                 return;
             }
             // Si opcion == 1 (Continuar sin datos), seguimos adelante
@@ -74,7 +74,7 @@ public class Main {
                 } catch (Exception e) {
                     System.err.println("ERROR al crear interfaz: " + e.getMessage());
                     e.printStackTrace();
-                    mostrarError("Error al iniciar la aplicación: " + e.getMessage());
+                    mostrarError("Error al iniciar la aplicacion: " + e.getMessage());
                 }
             }
         });
@@ -103,7 +103,7 @@ public class Main {
 
     private static void mostrarError(final String mensaje) {
         System.err.println("ERROR: " + mensaje);
-        // Intentar mostrar diálogo si Swing está disponible
+        // Intentar mostrar dialogo si Swing esta disponible
         try {
             SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
@@ -111,7 +111,7 @@ public class Main {
                 }
             });
         } catch (Exception e) {
-            // Si Swing no está listo, al menos imprimimos en consola
+            // Si Swing no esta listo, al menos imprimimos en consola
         }
     }
 
@@ -122,24 +122,24 @@ public class Main {
                 public void run() {
                     Object[] opciones = {"Reintentar", "Continuar sin datos", "Salir"};
                     resultado[0] = JOptionPane.showOptionDialog(
-                        null,
-                        "No se pudo conectar a la base de datos MySQL.\n\n" +
-                        "Esto puede deberse a:\n" +
-                        "• El servidor MySQL no está en ejecución\n" +
-                        "• Problemas de red\n" +
-                        "• Configuración incorrecta\n\n" +
-                        "¿Qué desea hacer?",
-                        "Error de conexión",
-                        JOptionPane.YES_NO_CANCEL_OPTION,
-                        JOptionPane.ERROR_MESSAGE,
-                        null,
-                        opciones,
-                        opciones[1] // Opción por defecto: Continuar sin datos
-                    );
+                            null,
+                            "No se pudo conectar a la base de datos MySQL.\n\n"
+                            + "Esto puede deberse a:\n"
+                            + "• El servidor MySQL no esta en ejecucion\n"
+                            + "• Problemas de red\n"
+                            + "• Configuracion incorrecta\n\n"
+                            + "¿Que desea hacer?",
+                            "Error de conexion",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.ERROR_MESSAGE,
+                            null,
+                            opciones,
+                            opciones[1] // Opcion por defecto: Continuar sin datos
+                            );
                 }
             });
         } catch (Exception e) {
-            System.err.println("Error mostrando diálogo: " + e.getMessage());
+            System.err.println("Error mostrando dialogo: " + e.getMessage());
             return 2; // Salir por defecto si hay error
         }
         return resultado[0];

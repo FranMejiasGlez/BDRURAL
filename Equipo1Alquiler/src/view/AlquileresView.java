@@ -7,7 +7,8 @@ package view;
 
 /**
  *
- * @author Administrador
+ * @author Francisco Mejias
+ * @revision Andy Jan
  */
 public class AlquileresView extends javax.swing.JFrame {
 
@@ -18,13 +19,13 @@ public class AlquileresView extends javax.swing.JFrame {
      */
     public AlquileresView() {
         System.out.println("DEBUG: AlquileresView() constructor - ANTES de initComponents");
-        
+
         // Configurar JFrame antes de initComponents
         setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
         setTitle("RURALHOME - Alquiler de Alojamientos");
         setSize(800, 600);
         setLocationRelativeTo(null); // Centrar en pantalla
-        
+
         initComponents();
         System.out.println("DEBUG: AlquileresView() constructor - DESPUES de initComponents");
         // Aseguramos el estado inicial por código
@@ -40,24 +41,24 @@ public class AlquileresView extends javax.swing.JFrame {
         this(); // Llama al constructor por defecto que ya existe
         System.out.println("DEBUG: Constructor con controller - INICIO");
         this.controller = controller;
-        
+
         // Pasar el controller al panel de resultados
         if (panelResultados != null) {
             panelResultados.setController(controller);
         }
-        
+
         this.addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent e) {
                 controller.finalizarBD();
             }
         });
-        
+
         // Verificar estado de conexión y actualizar interfaz
         actualizarEstadoConexion();
-        
+
         System.out.println("DEBUG: Constructor con controller - FIN (datos se cargarán después)");
     }
-    
+
     /**
      * Actualiza el estado de la interfaz según la conexión a BD
      */
@@ -67,10 +68,10 @@ public class AlquileresView extends javax.swing.JFrame {
             botonBuscar.setEnabled(false);
             botonBuscar.setText("Sin conexión a BD");
             botonBuscar.setToolTipText("No se puede buscar: sin conexión a la base de datos");
-            
+
             // Mostrar mensaje de advertencia en el título
             setTitle("RURALHOME - Alquiler de Alojamientos [SIN CONEXIÓN]");
-            
+
             // Agregar etiqueta de advertencia si no existe
             agregarEtiquetaSinConexion();
         } else if (controller != null) {
@@ -81,9 +82,8 @@ public class AlquileresView extends javax.swing.JFrame {
             setTitle("RURALHOME - Alquiler de Alojamientos");
         }
     }
-    
     private javax.swing.JLabel labelSinConexion;
-    
+
     /**
      * Agrega una etiqueta de advertencia visible cuando no hay conexión
      */
@@ -93,7 +93,7 @@ public class AlquileresView extends javax.swing.JFrame {
             labelSinConexion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
             labelSinConexion.setForeground(java.awt.Color.RED);
             labelSinConexion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-            
+
             // Agregar al panel principal, arriba de todo
             java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
             gbc.gridx = 0;
@@ -105,11 +105,11 @@ public class AlquileresView extends javax.swing.JFrame {
             panelPrincipal.repaint();
         }
     }
-    
+
     // Método para cargar datos DESPUÉS de que la ventana es visible
     public void cargarDatosIniciales() {
         System.out.println("DEBUG: cargarDatosIniciales() - Iniciando carga en segundo plano");
-        
+
         // Cargar tipos en un hilo separado para no bloquear la interfaz
         new Thread(new Runnable() {
             public void run() {
@@ -327,10 +327,10 @@ public class AlquileresView extends javax.swing.JFrame {
         // 0. Verificar conexión antes de operar
         if (controller == null || !controller.isConexionActiva()) {
             javax.swing.JOptionPane.showMessageDialog(this,
-                "No hay conexión a la base de datos.\n" +
-                "Por favor, verifique que el servidor MySQL esté en ejecución y reinicie la aplicación.",
-                "Sin conexión",
-                javax.swing.JOptionPane.WARNING_MESSAGE);
+                    "No hay conexión a la base de datos.\n"
+                    + "Por favor, verifique que el servidor MySQL esté en ejecución y reinicie la aplicación.",
+                    "Sin conexión",
+                    javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
 
@@ -386,7 +386,7 @@ public class AlquileresView extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
-        
+
         // 6. Cambiar de pantalla (ocultar principal, mostrar resultados)
         panelPrincipal.setVisible(false);
         panelResultados.setVisible(true);

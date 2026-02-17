@@ -5,7 +5,6 @@
 package utils;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 import java.io.FileInputStream;
@@ -19,14 +18,14 @@ public class ResetAlquileres {
 
     public static void main(String[] args) {
         System.out.println("=== RESET DE ALQUILERES ===");
-        System.out.println("Esta utilidad pondrá Alquilado = 0 en todos los alojamientos");
+        System.out.println("Esta utilidad pondra Alquilado = 0 en todos los alojamientos");
         System.out.println();
 
         JDBC conector = new JDBC();
         Properties propiedades = new Properties();
 
         try {
-            // Cargar propiedades de conexión
+            // Cargar propiedades de conexion
             // Intentar varias rutas posibles
             String[] posiblesRutas = {
                 "Equipo1Alquiler/src/BDRURAL.properties",
@@ -49,7 +48,7 @@ public class ResetAlquileres {
             }
 
             if (fis == null) {
-                System.out.println("ERROR: No se pudo encontrar BDRURAL.properties en ninguna ubicación");
+                System.out.println("ERROR: No se pudo encontrar BDRURAL.properties en ninguna ubicacion");
                 System.out.println("DEBUG: Directorio actual: " + System.getProperty("user.dir"));
                 return;
             }
@@ -73,7 +72,7 @@ public class ResetAlquileres {
             System.out.println("✓ Reset completado exitosamente");
             System.out.println("  Filas actualizadas: " + filasAfectadas);
             System.out.println();
-            System.out.println("Todos los alojamientos están ahora disponibles (Alquilado = 0)");
+            System.out.println("Todos los alojamientos estan ahora disponibles (Alquilado = 0)");
 
             stmt.close();
 
@@ -81,7 +80,7 @@ public class ResetAlquileres {
             System.out.println("ERROR: " + e.getMessage());
             e.printStackTrace();
         } finally {
-            // Solo cerrar si la conexión fue exitosa
+            // Solo cerrar si la conexion fue exitosa
             if (conector != null && conector.getConexion() != null) {
                 conector.cerrarConexion();
             }

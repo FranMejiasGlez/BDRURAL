@@ -15,7 +15,8 @@ import javax.swing.JFrame;
 
 /**
  *
- * @author Mejias Gonzalez Francisco
+ * @author Andy Jan
+ * @revision Francisco Mejias
  */
 public class RHController {
 
@@ -28,7 +29,7 @@ public class RHController {
     public ResultSet buscar(String provincia, int tipo,
             String ubicacion, int capacidad) {
         if (!verificarConexion()) {
-            System.out.println("ERROR: No hay conexión activa para realizar la búsqueda");
+            System.out.println("ERROR: No hay conexion activa para realizar la búsqueda");
             return null;
         }
         this.conector.setSentenciaSQL(generarSQL(provincia, tipo, ubicacion, capacidad));
@@ -65,7 +66,7 @@ public class RHController {
             sql.append(" AND Tipo = ").append(tipo);
         }
 
-        // Filtro por ubicación
+        // Filtro por ubicacion
         if (ubicacion != null && !ubicacion.isEmpty()) {
             sql.append(" AND Ubicacion = '").append(ubicacion).append("'");
         }
@@ -97,7 +98,7 @@ public class RHController {
             return false;
         }
         try {
-            // Hacer una consulta simple para verificar que la conexión sigue activa
+            // Hacer una consulta simple para verificar que la conexion sigue activa
             conector.setSentenciaSQL("SELECT 1");
             boolean resultado = conector.ejecutarConsulta();
             if (resultado && conector.getCursor() != null) {
@@ -113,7 +114,7 @@ public class RHController {
 
     public ResultSet buscarTipos() {
         if (!verificarConexion()) {
-            System.out.println("ERROR: No hay conexión activa para cargar tipos");
+            System.out.println("ERROR: No hay conexion activa para cargar tipos");
             return null;
         }
         String sentencia = "SELECT * FROM TIPOS";
@@ -153,23 +154,23 @@ public class RHController {
     /**
      * Alquila un alojamiento actualizando el campo Alquilado a 1 en la BD.
      * Utiliza manejo explícito de transacciones (RA2.j).
-     * 
+     *
      * @param referencia La referencia del alojamiento a alquilar
      * @return true si el alquiler fue exitoso, false en caso contrario
      */
     public boolean alquilarAlojamiento(String referencia) {
         if (!verificarConexion()) {
-            System.out.println("ERROR: No hay conexión activa para realizar el alquiler");
+            System.out.println("ERROR: No hay conexion activa para realizar el alquiler");
             return false;
         }
         Connection conn = null;
         ResultSet rs = null;
-        
+
         try {
-            // 1. Obtener conexión y desactivar auto-commit (iniciar transacción)
+            // 1. Obtener conexion y desactivar auto-commit (iniciar transaccion)
             conn = conector.getConexion();
             conn.setAutoCommit(false);
-            
+
             // 2. Ejecutar consulta actualizable para obtener el registro
             // Seleccionamos la PK (Referencia) y la columna a actualizar (Alquilado)
             // La PK es obligatoria para que el ResultSet sea actualizable en JDBC
@@ -177,30 +178,30 @@ public class RHController {
             conector.setSentenciaSQL(sql);
             conector.ejecutarConsultaActualizable();
             rs = conector.getCursor();
-            
+
             // 3. Verificar que existe y modificar
             if (rs != null && rs.next()) {
                 // Actualizar el campo Alquilado a 1
                 rs.updateInt("Alquilado", 1);
                 rs.updateRow();  // UPDATE ejecutado en la BD
-                
-                // 4. Confirmar transacción
+
+                // 4. Confirmar transaccion
                 conn.commit();
                 System.out.println("DEBUG: Alquiler confirmado para referencia " + referencia);
                 return true;
             } else {
-                // No se encontró el alojamiento o ya está alquilado
+                // No se encontro el alojamiento o ya está alquilado
                 conn.rollback();
-                System.out.println("DEBUG: No se encontró alojamiento disponible con referencia " + referencia);
+                System.out.println("DEBUG: No se encontro alojamiento disponible con referencia " + referencia);
                 return false;
             }
-            
+
         } catch (SQLException e) {
-            // 5. En caso de error, revertir transacción
+            // 5. En caso de error, revertir transaccion
             try {
                 if (conn != null) {
                     conn.rollback();
-                    System.out.println("DEBUG: Transacción revertida por error");
+                    System.out.println("DEBUG: Transaccion revertida por error");
                 }
             } catch (SQLException ex) {
                 System.out.println("ERROR: No se pudo hacer rollback: " + ex.getMessage());

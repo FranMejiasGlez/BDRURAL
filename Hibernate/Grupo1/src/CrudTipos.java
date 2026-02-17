@@ -30,18 +30,18 @@ public class CrudTipos {
             teclado = new BufferedReader(new InputStreamReader(System.in));
             numero = Integer.valueOf(teclado.readLine());
             if (numero <= 0) {
-                System.out.println("Error: El código debe ser mayor que 0");
+                System.out.println("Error: El codigo debe ser mayor que 0");
                 return false;
             }
             Tipos tipoExistente = (Tipos) sesion.get(Tipos.class, numero);
             if (tipoExistente != null) {
-                System.out.println("Error: Ya existe un tipo con ese código");
+                System.out.println("Error: Ya existe un tipo con ese codigo");
                 return false;
             }
             System.out.println("Introduce una descripcion: ");
             descripcion = teclado.readLine();
             if (descripcion == null || descripcion.trim().isEmpty()) {
-                System.out.println("Error: La descripción no puede estar vacía");
+                System.out.println("Error: La descripcion no puede estar vacía");
                 return false;
             }
             Query query = sesion.createQuery(
@@ -50,7 +50,7 @@ public class CrudTipos {
             Long count = (Long) query.uniqueResult();
 
             if (count > 0) {
-                System.out.println("ERROR: Ya existe un tipo con esa descripción.");
+                System.out.println("ERROR: Ya existe un tipo con esa descripcion.");
                 return false;
             }
             tx = sesion.beginTransaction();
@@ -83,8 +83,8 @@ public class CrudTipos {
             int numero;
             Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
             Transaction tx = null;
-            // 1. Pedir código al usuario (usando BufferedReader como en alta)
-            System.out.print("Ingrese el código a eliminar: ");
+            // 1. Pedir codigo al usuario (usando BufferedReader como en alta)
+            System.out.print("Ingrese el codigo a eliminar: ");
             int codigo = Integer.parseInt(teclado.readLine());
 
 
@@ -93,7 +93,7 @@ public class CrudTipos {
                 Tipos tipo = (Tipos) sesion.get(Tipos.class, codigo);
 
                 if (tipo == null) {
-                    System.out.println("ERROR: No existe un tipo con ese código.");
+                    System.out.println("ERROR: No existe un tipo con ese codigo.");
                     return false;
                 }
 

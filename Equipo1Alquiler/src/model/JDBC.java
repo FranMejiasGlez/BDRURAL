@@ -14,6 +14,7 @@ import java.util.Properties;
 /**
  *
  * @author Mejias Gonzalez Francisco
+ * @revision Andy Jan
  */
 public class JDBC {
 

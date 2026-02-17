@@ -6,7 +6,8 @@ package view;
 
 /**
  *
- * @author Administrador
+ * @author Francisco Mejias
+ * @revision Andy Jan
  */
 public class FinalView extends javax.swing.JPanel {
 
