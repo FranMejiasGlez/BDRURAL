@@ -61,11 +61,13 @@ public class CrudTipos {
             tx.commit();
 
             System.out.println("Alta correcta");
+            return true;
         } catch (Exception e) {
             if (tx != null) {
                 tx.rollback();
             }
             System.out.println("Error: " + e.getMessage());
+            return false;
         } finally {
             sesion.close();
         }
@@ -73,43 +75,48 @@ public class CrudTipos {
     }
 
     public boolean baja() {
-        BufferedReader teclado;
-        String descripcion;
-        int numero;
-        Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
-        Transaction tx = null;
-        // 1. Pedir código al usuario (usando BufferedReader como en alta)
-        System.out.print("Ingrese el código a eliminar: ");
-        int codigo = Integer.parseInt(teclado.readLine());
 
-        Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
-        Transaction tx = null;
 
         try {
-            // 2. Verificar que existe el registro
-            Tipos tipo = (Tipos) sesion.get(Tipos.class, codigo);
+            BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
+            String descripcion;
+            int numero;
+            Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
+            Transaction tx = null;
+            // 1. Pedir código al usuario (usando BufferedReader como en alta)
+            System.out.print("Ingrese el código a eliminar: ");
+            int codigo = Integer.parseInt(teclado.readLine());
 
-            if (tipo == null) {
-                System.out.println("ERROR: No existe un tipo con ese código.");
+
+            try {
+                // 2. Verificar que existe el registro
+                Tipos tipo = (Tipos) sesion.get(Tipos.class, codigo);
+
+                if (tipo == null) {
+                    System.out.println("ERROR: No existe un tipo con ese código.");
+                    return false;
+                }
+
+                // 3. Eliminar dentro de transaccion
+                tx = sesion.beginTransaction();
+                sesion.delete(tipo);
+                tx.commit();
+
+                System.out.println("Baja exitosa: Tipo eliminado.");
+                return true;
+
+            } catch (Exception e) {
+                if (tx != null) {
+                    tx.rollback();
+                }
+                System.out.println("ERROR: " + e.getMessage());
                 return false;
+            } finally {
+                sesion.close();
             }
-
-            // 3. Eliminar dentro de transacción
-            tx = sesion.beginTransaction();
-            sesion.delete(tipo);
-            tx.commit();
-
-            System.out.println("Baja exitosa: Tipo eliminado.");
-            return true;
-
-        } catch (Exception e) {
-            if (tx != null) {
-                tx.rollback();
-            }
-            System.out.println("ERROR: " + e.getMessage());
+        } catch (IOException ex) {
+            Logger.getLogger(CrudTipos.class.getName()).log(Level.SEVERE, null, ex);
             return false;
-        } finally {
-            sesion.close();
         }
     }
 }
