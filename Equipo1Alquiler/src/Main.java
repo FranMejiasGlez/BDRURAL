@@ -32,8 +32,23 @@ public class Main {
         controller.setPropiedades(propiedades);
 
         // 3. Intentar conectar BD (antes de Swing)
-        if (!controller.conectarBD()) {
-            System.out.println("ADVERTENCIA: No se pudo conectar a BD. La app funcionará sin datos.");
+        boolean conexionExitosa = controller.conectarBD();
+        if (!conexionExitosa) {
+            // Mostrar diálogo con opciones al usuario
+            int opcion = mostrarDialogoConexionFallida();
+            
+            if (opcion == 0) { // Reintentar
+                System.out.println("Reintentando conexión...");
+                conexionExitosa = controller.conectarBD();
+                if (!conexionExitosa) {
+                    mostrarError("No se pudo conectar después de reintentar. La aplicación se cerrará.");
+                    return;
+                }
+            } else if (opcion == 2 || opcion == JOptionPane.CLOSED_OPTION) { // Salir o cerrar diálogo
+                System.out.println("Usuario eligió salir");
+                return;
+            }
+            // Si opcion == 1 (Continuar sin datos), seguimos adelante
         }
 
         // 4. INICIALIZAR SWING EN EDT (Event Dispatch Thread)
@@ -98,5 +113,35 @@ public class Main {
         } catch (Exception e) {
             // Si Swing no está listo, al menos imprimimos en consola
         }
+    }
+
+    private static int mostrarDialogoConexionFallida() {
+        final int[] resultado = new int[1];
+        try {
+            SwingUtilities.invokeAndWait(new Runnable() {
+                public void run() {
+                    Object[] opciones = {"Reintentar", "Continuar sin datos", "Salir"};
+                    resultado[0] = JOptionPane.showOptionDialog(
+                        null,
+                        "No se pudo conectar a la base de datos MySQL.\n\n" +
+                        "Esto puede deberse a:\n" +
+                        "• El servidor MySQL no está en ejecución\n" +
+                        "• Problemas de red\n" +
+                        "• Configuración incorrecta\n\n" +
+                        "¿Qué desea hacer?",
+                        "Error de conexión",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.ERROR_MESSAGE,
+                        null,
+                        opciones,
+                        opciones[1] // Opción por defecto: Continuar sin datos
+                    );
+                }
+            });
+        } catch (Exception e) {
+            System.err.println("Error mostrando diálogo: " + e.getMessage());
+            return 2; // Salir por defecto si hay error
+        }
+        return resultado[0];
     }
 }

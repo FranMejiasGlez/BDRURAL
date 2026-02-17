@@ -4,8 +4,6 @@
  */
 package model;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -41,10 +39,15 @@ public class JDBC {
                 System.out.println("Clase no encontrada");
                 return false;
             }
+            // Establecer timeout de login (en segundos)
+            DriverManager.setLoginTimeout(5);
             this.conexion = DriverManager.getConnection(urlConexion, usuario, contra);
             System.out.println("Conexion exitosa");
             return true;
         } catch (SQLException ex) {
+            if (ex.getMessage().contains("timeout") || ex.getMessage().contains("timed out") || ex.getMessage().contains("Connection refused")) {
+                System.out.println("TIMEOUT: El servidor MySQL no responde o ha rechazado la conexion");
+            }
             System.out.println("No se pudo realizar la conexion: " + ex.getMessage());
         }
         return false;
@@ -64,6 +67,7 @@ public class JDBC {
                     ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_READ_ONLY);
             cursor = stmt.executeQuery(sentenciaSQL);
+
             return true;
         } catch (SQLException e) {
             System.out.println("Error ejecutando consulta: " + e.getMessage());
@@ -77,6 +81,7 @@ public class JDBC {
                     ResultSet.TYPE_SCROLL_SENSITIVE,
                     ResultSet.CONCUR_UPDATABLE);
             cursor = stmt.executeQuery(sentenciaSQL);
+
             return true;
         } catch (SQLException e) {
             System.out.println("Error ejecutando consulta actualizable: " + e.getMessage());
@@ -90,8 +95,12 @@ public class JDBC {
 
     public boolean cerrarCursor() {
         try {
-            this.cursor.close();
-            return true;
+            if (this.cursor != null) {
+                this.cursor.close();
+                this.cursor = null;
+                return true;
+            }
+            return false;
         } catch (SQLException ex) {
             System.out.println("Error cerrando el cursor");
             return false;
@@ -101,8 +110,12 @@ public class JDBC {
 
     public boolean cerrarConexion() {
         try {
-            this.conexion.close();
-            return true;
+            if (this.conexion != null) {
+                this.conexion.close();
+                this.conexion = null;
+                return true;
+            }
+            return false;
         } catch (SQLException ex) {
             System.out.println("Error cerrando conexion con BBDD");
             return false;

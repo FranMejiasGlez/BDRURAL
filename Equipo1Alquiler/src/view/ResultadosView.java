@@ -223,6 +223,7 @@ public class ResultadosView extends javax.swing.JPanel {
         protected javax.swing.JButton button;
         private String label;
         private boolean isPushed;
+        private int currentRow = -1;
 
         public ButtonEditor(javax.swing.JCheckBox checkBox) {
             super(checkBox);
@@ -231,9 +232,80 @@ public class ResultadosView extends javax.swing.JPanel {
             button.addActionListener(new java.awt.event.ActionListener() {
                 @Override
                 public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    fireEditingStopped();
+                    // Ejecutar el alquiler directamente aquí, sin fireEditingStopped()
+                    procesarAlquiler();
                 }
             });
+        }
+        
+        private void procesarAlquiler() {
+            final int fila = currentRow;
+            System.out.println("DEBUG: Procesando alquiler para fila: " + fila);
+            
+            if (fila < 0 || fila >= ResultadosView.this.capacidades.size()) {
+                System.out.println("DEBUG: Fila inválida");
+                return;
+            }
+            
+            System.out.println("DEBUG: Tamaño de lista capacidades: " + ResultadosView.this.capacidades.size());
+
+            try {
+                // Obtener la capacidad y referencia del alojamiento
+                final int capacidad = ResultadosView.this.capacidades.get(fila);
+                final int referenciaInt = ResultadosView.this.referencias.get(fila);
+                final String referencia = String.valueOf(referenciaInt);
+                System.out.println("DEBUG: Fila " + fila + ", Referencia: " + referencia + ", Capacidad: " + capacidad);
+
+                // Verificar que el controller esté disponible
+                if (controller == null) {
+                    javax.swing.JOptionPane.showMessageDialog(button, 
+                        "ERROR: Controller no inicializado", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    cancelCellEditing();
+                    return;
+                }
+                
+                // Llamar al método del controller para alquilar en la BD (RA2.f y RA2.j)
+                boolean exito = controller.alquilarAlojamiento(referencia);
+                
+                if (exito) {
+                    // Actualizar contadores solo si el alquiler fue exitoso
+                    totalAlojamientos++;
+                    totalPersonas += capacidad;
+                    
+                    // Eliminar la fila inmediatamente
+                    try {
+                        javax.swing.table.DefaultTableModel modelo = 
+                            (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
+                        modelo.removeRow(fila);
+                        ResultadosView.this.capacidades.remove(fila);
+                        ResultadosView.this.referencias.remove(fila);
+                        System.out.println("DEBUG: Fila eliminada de la tabla");
+                    } catch (Exception e) {
+                        System.out.println("DEBUG: Error al eliminar fila: " + e.getMessage());
+                    }
+                    
+                    javax.swing.JOptionPane.showMessageDialog(button, 
+                        "Alquiler realizado exitosamente.\nTotal personas acumuladas: " + totalPersonas);
+                } else {
+                    // El alquiler falló (ya estaba alquilado o error en BD)
+                    javax.swing.JOptionPane.showMessageDialog(button, 
+                        "ERROR: No se pudo realizar el alquiler.\nEl alojamiento ya no está disponible o ha ocurrido un error.", 
+                        "Error de alquiler", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    
+                    // Recargar resultados para mostrar el estado actual
+                    recargarResultados();
+                }
+                
+            } catch (Exception e) {
+                System.out.println("DEBUG: Error al procesar alquiler: " + e.getMessage());
+                e.printStackTrace();
+                javax.swing.JOptionPane.showMessageDialog(button, 
+                    "ERROR inesperado: " + e.getMessage(), 
+                    "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            }
+            
+            // Cancelar la edición para evitar que la tabla intente actualizar la celda
+            cancelCellEditing();
         }
 
         // ESTO ES LO QUE TE FALTABA (El Renderer)
@@ -250,55 +322,14 @@ public class ResultadosView extends javax.swing.JPanel {
             label = (value == null) ? "Alquilo" : value.toString();
             button.setText(label);
             isPushed = true;
+            currentRow = row;  // Guardamos la fila actual para usarla en el ActionListener
             return button;
         }
 
         @Override
         public Object getCellEditorValue() {
-            if (isPushed) {
-
-                final int fila = tablaResultados.getSelectedRow();
-                System.out.println("DEBUG: Fila seleccionada: " + fila);
-                System.out.println("DEBUG: Tamaño de lista capacidades: " + ResultadosView.this.capacidades.size());
-
-                try {
-                    // Obtener la capacidad del alojamiento
-                    final int capacidad = ResultadosView.this.capacidades.get(fila);
-                    System.out.println("DEBUG: Fila " + fila + ", Capacidad: " + capacidad);
-
-                    // Actualizar contadores
-                    totalAlojamientos++;
-                    totalPersonas += capacidad;
-                    
-                    // Cancelar edición PRIMERO para evitar el error
-                    this.stopCellEditing();
-                    
-                    // Eliminar la fila DESPUÉS de un pequeño delay usando invokeLater
-                    javax.swing.SwingUtilities.invokeLater(new Runnable() {
-                        public void run() {
-                            try {
-                                javax.swing.table.DefaultTableModel modelo = 
-                                    (javax.swing.table.DefaultTableModel) tablaResultados.getModel();
-                                modelo.removeRow(fila);
-                                ResultadosView.this.capacidades.remove(fila);
-                                ResultadosView.this.referencias.remove(fila);
-                            } catch (Exception e) {
-                                System.out.println("DEBUG: Error al eliminar fila: " + e.getMessage());
-                            }
-                        }
-                    });
-                    
-                    javax.swing.JOptionPane.showMessageDialog(button, 
-                        "Alquiler realizado. Total personas acumuladas: " + totalPersonas);
-                    
-                } catch (Exception e) {
-                    System.out.println("DEBUG: Error al procesar alquiler: " + e.getMessage());
-                    e.printStackTrace();
-                }
-
-                isPushed = false;
-                return "ALQUILADO";
-            }
+            // La lógica de alquiler ahora está en procesarAlquiler() llamado desde el ActionListener
+            // Este método solo retorna el valor para que la tabla complete la edición
             isPushed = false;
             return label;
         }
@@ -306,6 +337,7 @@ public class ResultadosView extends javax.swing.JPanel {
         @Override
         public boolean stopCellEditing() {
             isPushed = false;
+            currentRow = -1;
             return super.stopCellEditing();
         }
     }

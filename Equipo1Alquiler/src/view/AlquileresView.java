@@ -52,7 +52,58 @@ public class AlquileresView extends javax.swing.JFrame {
             }
         });
         
+        // Verificar estado de conexión y actualizar interfaz
+        actualizarEstadoConexion();
+        
         System.out.println("DEBUG: Constructor con controller - FIN (datos se cargarán después)");
+    }
+    
+    /**
+     * Actualiza el estado de la interfaz según la conexión a BD
+     */
+    private void actualizarEstadoConexion() {
+        if (controller != null && !controller.isConexionActiva()) {
+            // No hay conexión: deshabilitar botón de búsqueda
+            botonBuscar.setEnabled(false);
+            botonBuscar.setText("Sin conexión a BD");
+            botonBuscar.setToolTipText("No se puede buscar: sin conexión a la base de datos");
+            
+            // Mostrar mensaje de advertencia en el título
+            setTitle("RURALHOME - Alquiler de Alojamientos [SIN CONEXIÓN]");
+            
+            // Agregar etiqueta de advertencia si no existe
+            agregarEtiquetaSinConexion();
+        } else if (controller != null) {
+            // Hay conexión: asegurar que el botón está habilitado
+            botonBuscar.setEnabled(true);
+            botonBuscar.setText("Buscar");
+            botonBuscar.setToolTipText("Buscar alojamientos");
+            setTitle("RURALHOME - Alquiler de Alojamientos");
+        }
+    }
+    
+    private javax.swing.JLabel labelSinConexion;
+    
+    /**
+     * Agrega una etiqueta de advertencia visible cuando no hay conexión
+     */
+    private void agregarEtiquetaSinConexion() {
+        if (labelSinConexion == null) {
+            labelSinConexion = new javax.swing.JLabel("⚠ SIN CONEXIÓN A BASE DE DATOS");
+            labelSinConexion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
+            labelSinConexion.setForeground(java.awt.Color.RED);
+            labelSinConexion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+            
+            // Agregar al panel principal, arriba de todo
+            java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+            gbc.gridx = 0;
+            gbc.gridy = 6;
+            gbc.gridwidth = 2;
+            gbc.insets = new java.awt.Insets(20, 0, 0, 0);
+            panelPrincipal.add(labelSinConexion, gbc);
+            panelPrincipal.revalidate();
+            panelPrincipal.repaint();
+        }
     }
     
     // Método para cargar datos DESPUÉS de que la ventana es visible
@@ -81,6 +132,15 @@ public class AlquileresView extends javax.swing.JFrame {
         System.out.println("DEBUG: cargarTipos() llamado");
         System.out.println("DEBUG: controller = " + controller);
         if (controller != null) {
+            // Verificar conexión antes de intentar cargar
+            if (!controller.isConexionActiva()) {
+                System.out.println("DEBUG: Sin conexión a BD, no se cargarán tipos");
+                // Mantener solo "Sin especificar" en el combo
+                selectorTipo.removeAllItems();
+                selectorTipo.addItem("Sin especificar");
+                return;
+            }
+
             selectorTipo.removeAllItems();
             selectorTipo.addItem("Sin especificar");
             try {
@@ -264,6 +324,16 @@ public class AlquileresView extends javax.swing.JFrame {
         return true;
     }
     private void botonBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarActionPerformed
+        // 0. Verificar conexión antes de operar
+        if (controller == null || !controller.isConexionActiva()) {
+            javax.swing.JOptionPane.showMessageDialog(this,
+                "No hay conexión a la base de datos.\n" +
+                "Por favor, verifique que el servidor MySQL esté en ejecución y reinicie la aplicación.",
+                "Sin conexión",
+                javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         // 1. Capturar los valores de los filtros
         String provincia = inputTextProvincia.getText().trim();
         if (!esTextoValido(provincia)) {

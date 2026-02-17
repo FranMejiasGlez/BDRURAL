@@ -1,0 +1,128 @@
+@startuml
+!theme cyborg-outline
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+skinparam package {
+    BackgroundColor LightGray
+    BorderColor Black
+    FontSize 14
+    FontStyle bold
+}
+title Diagrama de Clases MVC - RuralHome - Alquileres
+' ==================== PAQUETE VIEW ====================
+package "View" {
+    class AlquileresView {
+        - controller: RHController
+        - botonBuscar: JButton
+        - selectorTipo: JComboBox
+        - inputTextProvincia: JTextField
+        - inputTextCapacidad: JTextField
+        - checkBoxEnPoblacion: JCheckBox
+        - checkBoxAislada: JCheckBox
+        - panelPrincipal: JPanel
+        - panelResultados: ResultadosView
+        - labelSinConexion: JLabel
+        + AlquileresView()
+        + AlquileresView(controller: RHController)
+        + cargarDatosIniciales(): void
+        + cargarTipos(): void
+        + getPanelResultados(): ResultadosView
+        - actualizarEstadoConexion(): void
+        - agregarEtiquetaSinConexion(): void
+        - esTextoValido(texto: String): boolean
+        - botonBuscarActionPerformed(evt: ActionEvent): void
+    }
+    
+    class ResultadosView {
+        - controller: RHController
+        - tablaResultados: JTable
+        - totalAlojamientos: int
+        - totalPersonas: int
+        - capacidades: ArrayList<Integer>
+        - referencias: ArrayList<Integer>
+        - filtroProvincia: String
+        - filtroTipo: int
+        - filtroUbicacion: String
+        - filtroCapacidad: int
+        + ResultadosView()
+        + setController(controller: RHController): void
+        + setCapacidadInicial(capacidad: int): void
+        + cargarResultados(rs: ResultSet, provincia: String, tipo: int, ubicacion: String, capacidad: int): void
+        + recargarResultados(): void
+        + getTotalAlojamientos(): int
+        + getTotalPersonas(): int
+    }
+    
+    class FinalView {
+        + setMensajeFinal(totalAlojamientos: int, totalPersonas: int): void
+    }
+}
+' ==================== PAQUETE CONTROLLER ====================
+package "Controller" {
+    class RHController {
+        - conector: JDBC
+        - propiedades: Properties
+        - alquileresView: AlquileresView
+        - framePrincipal: JFrame
+        - conexionActiva: boolean
+        + setPropiedades(propiedades: Properties): void
+        + setAlquileresView(view: AlquileresView): void
+        + setFramePrincipal(frame: JFrame): void
+        + conectarBD(): boolean
+        + isConexionActiva(): boolean
+        + verificarConexion(): boolean
+        + buscar(provincia: String, tipo: int, ubicacion: String, capacidad: int): ResultSet
+        + buscarTipos(): ResultSet
+        + volver(): void
+        + finalizarBD(): void
+        + finalizar(totalAlojamientos: int, totalPersonas: int): void
+        + alquilarAlojamiento(referencia: String): boolean
+        - generarSQL(provincia: String, tipo: int, ubicacion: String, capacidad: int): String
+    }
+}
+' ==================== PAQUETE MODEL ====================
+package "Model" {
+    class JDBC {
+        - conexion: Connection
+        - sentenciaSQL: String
+        - cursor: ResultSet
+        + setConexion(properties: Properties): boolean
+        + getConexion(): Connection
+        + setSentenciaSQL(strSQL: String): void
+        + ejecutarConsulta(): boolean
+        + ejecutarConsultaActualizable(): boolean
+        + getCursor(): ResultSet
+        + cerrarCursor(): boolean
+        + cerrarConexion(): boolean
+    }
+}
+
+' ==================== PAQUETE LIBRERÍAS EXTERNAS ====================
+package "Java Standard Library" #LightYellow {
+    class JFrame
+    class JPanel
+    class ResultSet
+    class Connection
+    class Properties
+}
+' ==================== RELACIONES ENTRE PAQUETES ====================
+
+RHController ..> JDBC : utiliza >
+RHController ..> AlquileresView : controla >
+RHController ..> FinalView : navega >
+AlquileresView ..> ResultadosView : contiene >
+AlquileresView ..> RHController : recibe >
+ResultadosView ..> RHController : recibe >
+' ==================== DEPENDENCIAS CON LIBRERÍAS ====================
+AlquileresView --|> JFrame
+ResultadosView --|> JPanel
+FinalView --|> JPanel
+JDBC ..> Connection
+JDBC ..> ResultSet
+RHController ..> Properties
+RHController ..> ResultSet
+@enduml
