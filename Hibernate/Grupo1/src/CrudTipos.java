@@ -119,4 +119,47 @@ public class CrudTipos {
             return false;
         }
     }
+
+    public boolean modificar() {
+        Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
+        BufferedReader teclado = new BufferedReader(new InputStreamReader(System.in));
+        Transaction tx = null;
+        Tipos tipo = null;
+
+        try {
+            while (tipo == null) {
+                System.out.print("Ingrese el codigo a modificar: ");
+                try {
+                    int codigo = Integer.parseInt(teclado.readLine());
+                    tipo = (Tipos) sesion.get(Tipos.class, codigo);
+
+                    if (tipo == null) {
+                        System.out.println("ERROR: No existe un tipo con ese codigo. Inténtelo de nuevo.");
+                    }
+                } catch (NumberFormatException e) {
+                    System.out.println("ERROR: Debe ingresar un número entero válido.");
+                }
+            }
+
+            System.out.println("Descripción actual: " + tipo.getDescripcion());
+            System.out.print("Ingrese la nueva descripción: ");
+            String nuevaDescripcion = teclado.readLine();
+
+            tx = sesion.beginTransaction();
+            tipo.setDescripcion(nuevaDescripcion);
+            tx.commit();
+
+            System.out.println("Modificación exitosa.");
+            return true;
+
+        } catch (Exception e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            System.out.println("ERROR: " + e.getMessage());
+            return false;
+        } finally {
+            sesion.close();
+        }
+    }
 }
