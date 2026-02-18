@@ -176,15 +176,19 @@ public class CrudTipos {
     public void resumenTipos(){
     	Session sesion = SessionFactoryUtil.getSessionFactory().openSession();
     	
-    	String hql = "SELECT t.nombre, COUNT(a) FROM Alojamiento a JOIN a.tipo t GROUP BY t.id, t.nombre";
-    	List<Object[]> resultados = sesion.createQuery(hql).list();
+    	try{
+    	List<Tipos> tipos = sesion.createQuery("FROM  primero.Tipos").list();
     	
-    	for(Object[] fila : resultados){
-    		String tipo = (String) fila[0];
-    		int cantidad = (int) fila[1];
-    		System.out.println(tipo + ": "+ cantidad);
+    	for(Tipos tipo : tipos){
+
+    		String consulta = "SELECT COUNT(a) FROM primero.Alojamientos a WHERE a.tipo = :codigo";
+    		Long conteo = (Long) sesion.createQuery(consulta).setParameter("codigo", tipo.getCodigo()).uniqueResult();
+    		
+    		System.out.println(tipo.getDescripcion() + ": " + conteo);
     	}
-    
+    	} finally{
+    		sesion.close();
+    	}
     }
     
     
