@@ -48,7 +48,7 @@ public class CrudTipos {
                 return false;
             }
             Query query = sesion.createQuery(
-                    "SELECT COUNT(t) FROM POJO.Tipos t WHERE t.descripcion = :desc");
+                    "SELECT COUNT(t) FROM primero.Tipos t WHERE t.descripcion = :desc");
             query.setParameter("desc", descripcion);
             Long count = (Long) query.uniqueResult();
 
@@ -169,6 +169,12 @@ public class CrudTipos {
             System.out.println("ERROR: " + e.getMessage());
             return false;
         } finally {
+        	try {
+				teclado.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             sesion.close();
         }
     }
