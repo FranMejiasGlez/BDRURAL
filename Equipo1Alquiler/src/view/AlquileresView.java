@@ -14,9 +14,6 @@ public class AlquileresView extends javax.swing.JFrame {
 
     private controller.RHController controller;
 
-    /**
-     * Creates new form AlquileresView
-     */
     public AlquileresView() {
         System.out.println("DEBUG: AlquileresView() constructor - ANTES de initComponents");
 
@@ -28,7 +25,7 @@ public class AlquileresView extends javax.swing.JFrame {
 
         initComponents();
         System.out.println("DEBUG: AlquileresView() constructor - DESPUES de initComponents");
-        // Aseguramos el estado inicial por código
+
         panelPrincipal.setVisible(true);   // Este debe estar SIEMPRE true al inicio
         panelResultados.setVisible(false); // Este oculto hasta que busquemos
 
@@ -53,29 +50,29 @@ public class AlquileresView extends javax.swing.JFrame {
             }
         });
 
-        // Verificar estado de conexión y actualizar interfaz
+        // Verificar estado de conexion y actualizar interfaz
         actualizarEstadoConexion();
 
-        System.out.println("DEBUG: Constructor con controller - FIN (datos se cargarán después)");
+        System.out.println("DEBUG: Constructor con controller - FIN (datos se cargaran despues)");
     }
 
     /**
-     * Actualiza el estado de la interfaz según la conexión a BD
+     * Actualiza el estado de la interfaz segun la conexion a BD
      */
     private void actualizarEstadoConexion() {
         if (controller != null && !controller.isConexionActiva()) {
-            // No hay conexión: deshabilitar botón de búsqueda
+            // No hay conexion: deshabilitar boton de busqueda
             botonBuscar.setEnabled(false);
-            botonBuscar.setText("Sin conexión a BD");
-            botonBuscar.setToolTipText("No se puede buscar: sin conexión a la base de datos");
+            botonBuscar.setText("Sin conexion a BD");
+            botonBuscar.setToolTipText("No se puede buscar: sin conexion a la base de datos");
 
             // Mostrar mensaje de advertencia en el título
-            setTitle("RURALHOME - Alquiler de Alojamientos [SIN CONEXIÓN]");
+            setTitle("RURALHOME - Alquiler de Alojamientos [SIN CONEXION]");
 
             // Agregar etiqueta de advertencia si no existe
             agregarEtiquetaSinConexion();
         } else if (controller != null) {
-            // Hay conexión: asegurar que el botón está habilitado
+            // Hay conexion: asegurar que el boton esta habilitado
             botonBuscar.setEnabled(true);
             botonBuscar.setText("Buscar");
             botonBuscar.setToolTipText("Buscar alojamientos");
@@ -85,11 +82,11 @@ public class AlquileresView extends javax.swing.JFrame {
     private javax.swing.JLabel labelSinConexion;
 
     /**
-     * Agrega una etiqueta de advertencia visible cuando no hay conexión
+     * Agrega una etiqueta de advertencia visible cuando no hay conexion
      */
     private void agregarEtiquetaSinConexion() {
         if (labelSinConexion == null) {
-            labelSinConexion = new javax.swing.JLabel("⚠ SIN CONEXIÓN A BASE DE DATOS");
+            labelSinConexion = new javax.swing.JLabel("SIN CONEXION A BASE DE DATOS");
             labelSinConexion.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 14));
             labelSinConexion.setForeground(java.awt.Color.RED);
             labelSinConexion.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -106,7 +103,7 @@ public class AlquileresView extends javax.swing.JFrame {
         }
     }
 
-    // Método para cargar datos DESPUÉS de que la ventana es visible
+    // Metodo para cargar datos DESPUES de que la ventana es visible
     public void cargarDatosIniciales() {
         System.out.println("DEBUG: cargarDatosIniciales() - Iniciando carga en segundo plano");
 
@@ -118,7 +115,7 @@ public class AlquileresView extends javax.swing.JFrame {
                     System.out.println("DEBUG: cargarDatosIniciales() - Tipos cargados correctamente");
                 } catch (Exception e) {
                     System.err.println("DEBUG: Error cargando tipos: " + e.getMessage());
-                    // No es crítico, la app puede funcionar sin tipos
+
                 }
             }
         }).start();
@@ -132,9 +129,9 @@ public class AlquileresView extends javax.swing.JFrame {
         System.out.println("DEBUG: cargarTipos() llamado");
         System.out.println("DEBUG: controller = " + controller);
         if (controller != null) {
-            // Verificar conexión antes de intentar cargar
+            // Verificar conexion antes de intentar cargar
             if (!controller.isConexionActiva()) {
-                System.out.println("DEBUG: Sin conexión a BD, no se cargarán tipos");
+                System.out.println("DEBUG: Sin conexion a BD, no se cargaran tipos");
                 // Mantener solo "Sin especificar" en el combo
                 selectorTipo.removeAllItems();
                 selectorTipo.addItem("Sin especificar");
@@ -312,7 +309,7 @@ public class AlquileresView extends javax.swing.JFrame {
 
     private boolean esTextoValido(String texto) {
         if (texto == null || texto.isEmpty()) {
-            return true; // Vacío es válido (sin filtro)
+            return true; // Vacío es valido (sin filtro)
         }
         // Caracteres peligrosos para SQL Injection
         String caracteresPeligrosos = ";'\"--/*";
@@ -324,12 +321,12 @@ public class AlquileresView extends javax.swing.JFrame {
         return true;
     }
     private void botonBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonBuscarActionPerformed
-        // 0. Verificar conexión antes de operar
+        // 0. Verificar conexion antes de operar
         if (controller == null || !controller.isConexionActiva()) {
             javax.swing.JOptionPane.showMessageDialog(this,
-                    "No hay conexión a la base de datos.\n"
-                    + "Por favor, verifique que el servidor MySQL esté en ejecución y reinicie la aplicación.",
-                    "Sin conexión",
+                    "No hay conexion a la base de datos.\n"
+                    + "Por favor, verifique que el servidor MySQL este en ejecucion y reinicie la aplicacion.",
+                    "Sin conexion",
                     javax.swing.JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -345,10 +342,10 @@ public class AlquileresView extends javax.swing.JFrame {
         // Obtener el índice seleccionado del combo (0 = "Sin especificar", 1 = Casa Rural, etc.)
         int tipoSeleccionado = selectorTipo.getSelectedIndex();
 
-        // Determinar ubicación según los checkboxes
+        // Determinar ubicacion segun los checkboxes
         String ubicacion = "";
         if (checkBoxEnPoblacion.isSelected() && !checkBoxAislada.isSelected()) {
-            ubicacion = "En población";
+            ubicacion = "En poblacion";
         } else if (checkBoxAislada.isSelected() && !checkBoxEnPoblacion.isSelected()) {
             ubicacion = "Aislada";
         } else {
@@ -363,7 +360,7 @@ public class AlquileresView extends javax.swing.JFrame {
                 capacidad = Integer.parseInt(textoCapacidad);
             }
         } catch (NumberFormatException e) {
-            capacidad = 0; // Si no es número válido, sin filtro
+            capacidad = 0; // Si no es numero valido, sin filtro
         }
 
         // 2. Pasar la capacidad inicial al panel de resultados (para el contador)
@@ -374,15 +371,15 @@ public class AlquileresView extends javax.swing.JFrame {
             try {
                 java.sql.ResultSet rs = controller.buscar(provincia, tipoSeleccionado, ubicacion, capacidad);
 
-                // 4. Llenar la tabla con los resultados (pasando los filtros para poder recargar después)
+                // 4. Llenar la tabla con los resultados (pasando los filtros para poder recargar despues)
                 panelResultados.cargarResultados(rs, provincia, tipoSeleccionado, ubicacion, capacidad);
 
-                // 5. Cerrar el ResultSet después de usarlo
+                // 5. Cerrar el ResultSet despues de usarlo
                 if (rs != null) {
                     rs.close();
                 }
             } catch (Exception e) {
-                System.out.println("Error en búsqueda: " + e.getMessage());
+                System.out.println("Error en busqueda: " + e.getMessage());
                 e.printStackTrace();
             }
         }
