@@ -5,7 +5,8 @@
 
 /**
  *
- * @author Mejias Gonzalez Francisco
+ * @author Pablo Jimenez Fuentes
+ * @revision Alvaro Perez
  */
 import java.io.IOException;
 import java.util.Properties;

@@ -13,8 +13,8 @@ import java.util.Properties;
 
 /**
  *
- * @author Mejias Gonzalez Francisco
- * @revision Andy Jan
+ * @author Andy Jan
+ * @revision Mejias Gonzalez Francisco
  */
 public class JDBC {
 

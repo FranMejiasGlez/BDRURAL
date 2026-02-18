@@ -66,7 +66,7 @@ public class AlquileresView extends javax.swing.JFrame {
             botonBuscar.setText("Sin conexion a BD");
             botonBuscar.setToolTipText("No se puede buscar: sin conexion a la base de datos");
 
-            // Mostrar mensaje de advertencia en el título
+            // Mostrar mensaje de advertencia en el titulo
             setTitle("RURALHOME - Alquiler de Alojamientos [SIN CONEXION]");
 
             // Agregar etiqueta de advertencia si no existe
@@ -309,7 +309,7 @@ public class AlquileresView extends javax.swing.JFrame {
 
     private boolean esTextoValido(String texto) {
         if (texto == null || texto.isEmpty()) {
-            return true; // Vacío es valido (sin filtro)
+            return true; // Vacio es valido (sin filtro)
         }
         // Caracteres peligrosos para SQL Injection
         String caracteresPeligrosos = ";'\"--/*";
@@ -339,7 +339,7 @@ public class AlquileresView extends javax.swing.JFrame {
                     "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
             return;
         }
-        // Obtener el índice seleccionado del combo (0 = "Sin especificar", 1 = Casa Rural, etc.)
+        // Obtener el indice seleccionado del combo (0 = "Sin especificar", 1 = Casa Rural, etc.)
         int tipoSeleccionado = selectorTipo.getSelectedIndex();
 
         // Determinar ubicacion segun los checkboxes
