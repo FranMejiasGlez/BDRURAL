@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 18-feb-2026 9:29:13 by Hibernate Tools 3.4.0.CR1 -->
+<hibernate-mapping>
+    <class name="primero.Alojamientos" table="alojamientos" catalog="BDRURAL">
+        <id name="referencia" type="java.lang.Integer">
+            <column name="Referencia" />
+            <generator class="identity" />
+        </id>
+        <property name="nombre" type="string">
+            <column name="Nombre" length="60" not-null="true" />
+        </property>
+        <property name="poblacion" type="string">
+            <column name="Poblacion" length="40" not-null="true" />
+        </property>
+        <property name="provincia" type="string">
+            <column name="Provincia" length="30" not-null="true" />
+        </property>
+        <property name="capacidad" type="byte">
+            <column name="Capacidad" not-null="true" />
+        </property>
+        <property name="tipo" type="java.lang.Integer">
+            <column name="Tipo" />
+        </property>
+        <property name="ubicacion" type="string">
+            <column name="Ubicacion" length="12" not-null="true" />
+        </property>
+        <property name="alquilado" type="java.lang.Boolean">
+            <column name="Alquilado" />
+        </property>
+    </class>
+</hibernate-mapping>
